@@ -215,17 +215,14 @@ const handleSubmit = async () => {
       date: form.value.date as string,
     })
 
-    // Reset form and show success
+    // Reset form
     form.value.amount = ''
     form.value.category = ''
     form.value.description = ''
     form.value.date = new Date().toISOString().split('T')[0]
-    submitSuccess.value = true
 
-    // Redirect to dashboard after a short delay
-    setTimeout(() => {
-        router.push('/dashboard')
-    }, 1000)
+    // Redirect to dashboard immediately
+    router.push('/dashboard')
 
   } catch (err) {
     submitError.value = err instanceof Error ? err.message : 'Failed to add transaction'
