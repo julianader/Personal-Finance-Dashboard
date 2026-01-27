@@ -13,15 +13,17 @@
     <div class="flex items-center gap-4">
       <div>
         <p :class="['font-bold text-lg', transaction.type === 'income' ? 'text-success' : 'text-danger']">
-          {{ transaction.type === 'income' ? '+' : '-' }}{{ formatCurrency(transaction.amount, 'USD') }}
+          {{ transaction.type === 'income' ? '+' : '-' }}{{ formatCurrency(currencyStore.convertFromBase(transaction.amount), currencyStore.selectedCurrency.code) }}
         </p>
-        <!-- Original currency will be added later -->
+        <p v-if="transaction.originalAmount && transaction.originalCurrency" class="text-xs text-text-tertiary">
+          Originally: {{ formatCurrency(transaction.originalAmount, transaction.originalCurrency) }}
+        </p>
       </div>
       <button
-          v-if="showDelete"
-          @click="$emit('delete', transaction.id)"
-          class="p-2 text-text-tertiary hover:text-danger hover:bg-danger hover:bg-opacity-10 rounded-lg transition-colors"
-          title="Delete transaction"
+        v-if="showDelete"
+        @click="$emit('delete', transaction.id)"
+        class="p-2 text-text-tertiary hover:text-danger hover:bg-danger hover:bg-opacity-10 rounded-lg transition-colors"
+        title="Delete transaction"
       >
         <TrashIcon class="w-4 h-4" />
       </button>
@@ -31,6 +33,7 @@
 
 <script setup lang="ts">
 import { formatCurrency, formatDate, getCategoryIcon } from '@/utils/helpers'
+import { useCurrencyStore } from '@/stores/currencyStore'
 import {
   ShoppingBagIcon,
   HomeIcon,
@@ -57,6 +60,8 @@ defineProps<Props>()
 defineEmits<{
   delete: [id: string]
 }>()
+
+const currencyStore = useCurrencyStore()
 
 const getCategoryIconComponent = (category: string) => {
   const iconName = getCategoryIcon(category)

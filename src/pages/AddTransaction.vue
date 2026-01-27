@@ -34,9 +34,9 @@
 
         <!-- Amount -->
         <div>
-          <label for="amount" class="block text-sm font-medium text-text-primary mb-2">Amount (USD)</label>
+          <label for="amount" class="block text-sm font-medium text-text-primary mb-2">Amount</label>
           <div class="relative">
-            <span class="absolute left-3 top-2 text-text-tertiary ">$</span>
+            <span class="absolute left-3 top-2 text-text-tertiary ">{{ selectedTransactionCurrency.symbol }}</span>
             <input
               id="amount"
               v-model="form.amount"
@@ -51,17 +51,23 @@
           <p v-if="errors.amount" class="mt-1 text-sm text-danger">{{ errors.amount }}</p>
         </div>
 
-        <!-- Transaction Currency (Placeholder for now) -->
+        <!-- Transaction Currency -->
         <div>
           <label class="block text-sm font-medium text-text-primary mb-2">Transaction Currency</label>
           <select
             v-model="form.transactionCurrency"
             class="w-full px-4 py-2"
           >
-            <option value="USD">🇺🇸 USD - US Dollar</option>
+            <option
+              v-for="currency in currencyStore.SUPPORTED_CURRENCIES"
+              :key="currency.code"
+              :value="currency.code"
+            >
+              {{ currency.flag }} {{ currency.code }} - {{ currency.name }}
+            </option>
           </select>
           <p class="text-xs text-text-tertiary mt-1">
-            Amount is currently stored in USD (base currency)
+            Amount will be converted to {{ currencyStore.baseCurrency.code }} for storage
           </p>
         </div>
 
@@ -137,11 +143,13 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTransactionStore } from '@/stores/transactionStore'
+import { useCurrencyStore } from '@/stores/currencyStore'
 import { isValidAmount } from '@/utils/helpers'
 import CategorySelect from '@/components/CategorySelect.vue'
 
 const router = useRouter()
 const store = useTransactionStore()
+const currencyStore = useCurrencyStore()
 
 const form = ref({
   type: 'expense' as 'income' | 'expense',
@@ -149,7 +157,7 @@ const form = ref({
   category: '',
   description: '',
   date: new Date().toISOString().split('T')[0],
-  transactionCurrency: 'USD', // Hardcoded to USD for now
+  transactionCurrency: currencyStore.selectedCurrency.code,
 })
 
 const errors = ref({
@@ -162,6 +170,10 @@ const errors = ref({
 const submitError = ref('')
 const submitSuccess = ref(false)
 const isLoading = computed(() => store.loading)
+
+const selectedTransactionCurrency = computed(() => {
+  return currencyStore.SUPPORTED_CURRENCIES.find(c => c.code === form.value.transactionCurrency) || currencyStore.selectedCurrency
+})
 
 const validateForm = (): boolean => {
   errors.value = {
@@ -206,24 +218,31 @@ const handleSubmit = async () => {
 
   try {
     const originalAmount = parseFloat(form.value.amount)
+    const transactionCurrency = form.value.transactionCurrency
+
+    // Convert to base currency (USD) for storage
+    let amountInBaseCurrency = originalAmount
+    let originalAmountValue = undefined
+    let originalCurrencyValue = undefined
+
+    if (transactionCurrency !== currencyStore.baseCurrency.code) {
+      // Convert the amount from the selected transaction currency to base currency (USD)
+      amountInBaseCurrency = currencyStore.convertToBaseFrom(originalAmount, transactionCurrency)
+      originalAmountValue = originalAmount
+      originalCurrencyValue = transactionCurrency
+    }
 
     await store.addTransaction({
       type: form.value.type,
-      amount: originalAmount, // No conversion yet, amount is in USD
+      amount: amountInBaseCurrency,
+      originalAmount: originalAmountValue,
+      originalCurrency: originalCurrencyValue,
       category: form.value.category,
       description: form.value.description,
-      date: form.value.date as string,
+      date: form.value.date,
     })
 
-    // Reset form
-    form.value.amount = ''
-    form.value.category = ''
-    form.value.description = ''
-    form.value.date = new Date().toISOString().split('T')[0]
-
-    // Redirect to dashboard immediately
     router.push('/dashboard')
-
   } catch (err) {
     submitError.value = err instanceof Error ? err.message : 'Failed to add transaction'
   }

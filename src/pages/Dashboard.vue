@@ -24,7 +24,7 @@
                 <component :is="getCategoryIconComponent(category.category)" class="w-6 h-6 text-text-primary" />
                 <div>
                   <p class="font-medium text-text-primary capitalize">{{ category.category }}</p>
-                  <p class="text-xs text-text-tertiary">{{ formatCurrency(category.amount) }}</p>
+                  <p class="text-xs text-text-tertiary">{{ formatCurrency(category.amount, currencyStore.selectedCurrency.code) }}</p>
                 </div>
               </div>
               <span class="text-sm font-medium text-text-secondary">{{ category.percentage.toFixed(1) }}%</span>
@@ -88,6 +88,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useTransactionStore } from '@/stores/transactionStore'
+import { useCurrencyStore } from '@/stores/currencyStore'
 import { formatCurrency, getCategoryIcon } from '@/utils/helpers'
 import SummaryStats from '@/components/SummaryStats.vue'
 import TransactionList from '@/components/TransactionList.vue'
@@ -108,9 +109,11 @@ import {
 import type { StatItem } from '@/components/SummaryStats.vue'
 
 const store = useTransactionStore()
+const currencyStore = useCurrencyStore()
 
 onMounted(async () => {
   store.fetchTransactions()
+  await currencyStore.initialize()
 })
 
 const stats = computed(() => store.dashboardStats)
@@ -125,20 +128,20 @@ const expensePercentage = computed(() => {
 const summaryStats = computed<StatItem[]>(() => [
   {
     label: 'Total Balance',
-    value: formatCurrency(stats.value.balance),
+    value: formatCurrency(stats.value.balance, currencyStore.selectedCurrency.code),
     variant: 'gradient',
     subtitle: `${stats.value.transactionCount} transactions`,
   },
   {
     label: 'Total Income',
-    value: formatCurrency(stats.value.totalIncome),
+    value: formatCurrency(stats.value.totalIncome, currencyStore.selectedCurrency.code),
     variant: 'default',
     progress: 100,
     progressColor: 'bg-success',
   },
   {
     label: 'Total Expenses',
-    value: formatCurrency(stats.value.totalExpenses),
+    value: formatCurrency(stats.value.totalExpenses, currencyStore.selectedCurrency.code),
     variant: 'default',
     progress: expensePercentage.value,
     progressColor: 'bg-danger',
