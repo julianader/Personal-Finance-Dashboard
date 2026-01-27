@@ -12,8 +12,8 @@
         <div>
           <label class="block text-sm font-medium text-text-primary mb-2">Type</label>
           <select
-              v-model="filters.type"
-              class="w-full px-4 py-2"
+            v-model="filters.type"
+            class="w-full px-4 py-2"
           >
             <option value="">All Types</option>
             <option value="income">Income</option>
@@ -21,24 +21,21 @@
           </select>
         </div>
 
-        <!-- Category Filter (Placeholder for CategorySelect) -->
+        <!-- Category Filter -->
         <div>
           <label class="block text-sm font-medium text-text-primary mb-2">Category</label>
-          <select
-              v-model="filters.category"
-              class="w-full px-4 py-2"
-          >
-            <option value="">All Categories</option>
-            <option v-for="cat in availableCategories" :key="cat" :value="cat">{{ cat }}</option>
-          </select>
+          <CategorySelect
+            v-model="filters.category"
+            type="expense"
+          />
         </div>
 
         <!-- Sort -->
         <div>
           <label class="block text-sm font-medium text-text-primary mb-2">Sort By</label>
           <select
-              v-model="filters.sort"
-              class="w-full px-4 py-2"
+            v-model="filters.sort"
+            class="w-full px-4 py-2"
           >
             <option value="date-desc">Newest First</option>
             <option value="date-asc">Oldest First</option>
@@ -50,8 +47,8 @@
         <!-- Reset Button -->
         <div class="flex items-end">
           <button
-              @click="resetFilters"
-              class="w-full px-4 py-2 bg-surface-secondary hover:bg-surface-hover text-text-primary font-medium rounded-lg transition-colors border border-border-primary"
+            @click="resetFilters"
+            class="w-full px-4 py-2 bg-surface-secondary hover:bg-surface-hover text-text-primary font-medium rounded-lg transition-colors border border-border-primary"
           >
             Reset Filters
           </button>
@@ -63,11 +60,11 @@
     <div class="bg-surface-primary border border-border-primary rounded-xl shadow-sm overflow-hidden">
       <div v-if="filteredTransactions.length > 0" class="divide-y divide-border-primary">
         <TransactionCard
-            v-for="transaction in filteredTransactions"
-            :key="transaction.id"
-            :transaction="transaction"
-            :show-delete="true"
-            @delete="deleteTransaction"
+          v-for="transaction in filteredTransactions"
+          :key="transaction.id"
+          :transaction="transaction"
+          :show-delete="true"
+          @delete="deleteTransaction"
         />
       </div>
       <div v-else class="p-12 text-center text-text-tertiary">
@@ -76,16 +73,16 @@
       </div>
     </div>
 
-    <!-- Actions -->
-    <div v-if="transactions.length > 0" class="bg-surface-primary border border-border-primary rounded-xl p-4 shadow-sm">
+        <!-- Actions -->
+        <div v-if="transactions.length > 0" class="bg-surface-primary border border-border-primary rounded-xl p-4 shadow-sm">
       <div class="flex items-center justify-between">
         <div>
           <h3 class="text-lg font-semibold text-text-primary mb-1">Danger Zone</h3>
           <p class="text-sm text-text-secondary">Actions that cannot be undone</p>
         </div>
         <button
-            @click="deleteAllTransactions"
-            class="px-4 py-2 bg-danger hover:bg-danger/90 text-white font-medium rounded-lg transition-colors"
+          @click="deleteAllTransactions"
+          class="px-4 py-2 bg-danger hover:bg-danger/90 text-white font-medium rounded-lg transition-colors"
         >
           Delete All Transactions
         </button>
@@ -99,10 +96,26 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useTransactionStore } from '@/stores/transactionStore'
+import { useCurrencyStore } from '@/stores/currencyStore'
+import { getCategoryIcon } from '@/utils/helpers'
 import TransactionCard from '@/components/TransactionCard.vue'
-// CategorySelect will be imported later
+import CategorySelect from '@/components/CategorySelect.vue'
+import {
+  ShoppingBagIcon,
+  HomeIcon,
+  BoltIcon,
+  FilmIcon,
+  TruckIcon,
+  HeartIcon,
+  BookOpenIcon,
+  BriefcaseIcon,
+  ComputerDesktopIcon,
+  ChartBarIcon,
+  TagIcon,
+} from '@heroicons/vue/24/outline'
 
 const store = useTransactionStore()
+const currencyStore = useCurrencyStore()
 
 const filters = ref({
   type: '',
@@ -110,8 +123,9 @@ const filters = ref({
   sort: 'date-desc',
 })
 
-onMounted(() => {
+onMounted(async () => {
   store.fetchTransactions()
+  await currencyStore.initialize()
 })
 
 const transactions = computed(() => store.transactions)
@@ -156,6 +170,24 @@ const filteredTransactions = computed(() => {
   return filtered
 })
 
+
+const getCategoryIconComponent = (category: string) => {
+  const iconName = getCategoryIcon(category)
+  const icons: Record<string, any> = {
+    ShoppingBagIcon,
+    HomeIcon,
+    BoltIcon,
+    FilmIcon,
+    TruckIcon,
+    HeartIcon,
+    BookOpenIcon,
+    BriefcaseIcon,
+    ComputerDesktopIcon,
+    ChartBarIcon,
+    TagIcon,
+  }
+  return icons[iconName] || TagIcon
+}
 
 const resetFilters = () => {
   filters.value = {

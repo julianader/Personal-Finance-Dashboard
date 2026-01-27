@@ -9,7 +9,7 @@
 
     <!-- Hero Section -->
     <section class="relative overflow-hidden">
-      <div class="relative w-full px-4 py-20 lg:py-32 bg-transparent">
+      <div class="relative w-full px-4 py-20 lg:py-32 bg-transparent">      
         <div class="text-center">
           <!-- Logo and Brand -->
           <div class="flex items-center justify-center gap-3 mb-10 animate-fade-in">
@@ -33,8 +33,8 @@
           <!-- CTA Buttons -->
           <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up delay-400">
             <router-link
-                to="/dashboard"
-                class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold px-8 py-4 rounded-xl text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+              to="/dashboard"
+              class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold px-8 py-4 rounded-xl text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
             >
               Get Started Free
             </router-link>
@@ -85,7 +85,7 @@
           <!-- Feature 3 -->
           <div class="bg-surface-primary border border-border-primary rounded-2xl p-8 hover:shadow-xl hover:border-primary-200 transition-all duration-300 group animate-fade-in delay-400">
             <div class="w-16 h-16 bg-gradient-to-br from-success to-success/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <span class="text-3xl">🎯</span>
+              <ChartBarIcon class="w-8 h-8 text-success" />
             </div>
             <h4 class="text-2xl font-bold text-text-primary mb-4">Savings Goals</h4>
             <p class="text-text-secondary leading-relaxed">
@@ -130,6 +130,7 @@
     </section>
 
 
+
     <!-- CTA Section -->
     <section class="py-20 lg:py-32 bg-background-secondary">
       <div class="w-full px-4 text-center">
@@ -141,8 +142,8 @@
           Start your journey to financial freedom today. It's free, it's easy, and it works.
         </p>
         <router-link
-            to="/dashboard"
-            class="inline-block bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold px-12 py-5 rounded-xl text-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+          to="/dashboard"
+          class="inline-block bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold px-12 py-5 rounded-xl text-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
         >
           Start Tracking Now
         </router-link>
@@ -152,6 +153,7 @@
 </template>
 
 <script setup lang="ts">
+import { ChartBarIcon } from '@heroicons/vue/24/outline'
 // No reactive data needed for this landing page
 </script>
 
@@ -191,5 +193,10 @@
 .delay-600 { animation-delay: 0.6s; }
 .delay-800 { animation-delay: 0.8s; }
 .delay-1000 { animation-delay: 1.0s; }
-.delay-2000 { animation-delay: 2.0s; }
+
+/* Smooth hover transitions */
+.group:hover .group-hover\:scale-110 {
+  transform: scale(1.1);
+}
+
 </style>
