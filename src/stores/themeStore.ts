@@ -37,6 +37,11 @@ export const useThemeStore = defineStore('theme', () => {
     theme.value = theme.value === 'light' ? 'dark' : 'light'
   }
 
+  // Set specific theme
+  const setTheme = (newTheme: Theme) => {
+    theme.value = newTheme
+  }
+
   // Watch for theme changes and persist to localStorage
   watch(theme, (newTheme) => {
     localStorage.setItem('theme', newTheme)

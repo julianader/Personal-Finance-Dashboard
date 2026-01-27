@@ -12,20 +12,20 @@
         <div class="flex items-center gap-4">
           <nav class="hidden md:flex gap-8">
             <router-link
-                to="/dashboard"
-                :class="['text-sm font-medium transition-colors', isActive('/dashboard') ? 'text-primary-600' : 'text-text-secondary hover:text-text-primary']"
+              to="/dashboard"
+              :class="['text-sm font-medium transition-colors', isActive('/dashboard') ? 'text-primary-600' : 'text-text-secondary hover:text-text-primary']"
             >
               Dashboard
             </router-link>
             <router-link
-                to="/add"
-                :class="['text-sm font-medium transition-colors', isActive('/add') ? 'text-primary-600' : 'text-text-secondary hover:text-text-primary']"
+              to="/add"
+              :class="['text-sm font-medium transition-colors', isActive('/add') ? 'text-primary-600' : 'text-text-secondary hover:text-text-primary']"
             >
               Add Transaction
             </router-link>
             <router-link
-                to="/history"
-                :class="['text-sm font-medium transition-colors', isActive('/history') ? 'text-primary-600' : 'text-text-secondary hover:text-text-primary']"
+              to="/history"
+              :class="['text-sm font-medium transition-colors', isActive('/history') ? 'text-primary-600' : 'text-text-secondary hover:text-text-primary']"
             >
               History
             </router-link>
@@ -40,26 +40,26 @@
       <router-view />
     </main>
 
-    <!-- Mobile Bottom Navigation (Placeholder) -->
+    <!-- Mobile Bottom Navigation -->
     <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface-primary border-t border-border-primary shadow-lg transition-colors">
       <div class="flex justify-around">
         <router-link
-            to="/dashboard"
-            :class="['flex-1 py-3 text-center transition-colors', isActive('/dashboard') ? 'text-primary-600 border-t-2 border-primary-600' : 'text-text-secondary']"
+          to="/dashboard"
+          :class="['flex-1 py-3 text-center transition-colors', isActive('/dashboard') ? 'text-primary-600 border-t-2 border-primary-600' : 'text-text-secondary']"
         >
           <span class="text-xl">📊</span>
           <p class="text-xs mt-1">Dashboard</p>
         </router-link>
         <router-link
-            to="/add"
-            :class="['flex-1 py-3 text-center transition-colors', isActive('/add') ? 'text-primary-600 border-t-2 border-primary-600' : 'text-text-secondary']"
+          to="/add"
+          :class="['flex-1 py-3 text-center transition-colors', isActive('/add') ? 'text-primary-600 border-t-2 border-primary-600' : 'text-text-secondary']"
         >
           <span class="text-xl">➕</span>
           <p class="text-xs mt-1">Add</p>
         </router-link>
         <router-link
-            to="/history"
-            :class="['flex-1 py-3 text-center transition-colors', isActive('/history') ? 'text-primary-600 border-t-2 border-primary-600' : 'text-text-secondary']"
+          to="/history"
+          :class="['flex-1 py-3 text-center transition-colors', isActive('/history') ? 'text-primary-600 border-t-2 border-primary-600' : 'text-text-secondary']"
         >
           <span class="text-xl">📋</span>
           <p class="text-xs mt-1">History</p>

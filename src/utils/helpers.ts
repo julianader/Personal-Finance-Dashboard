@@ -1,5 +1,5 @@
 /**
- * Format currency amount with specified currency (simple version)
+ * Format currency amount with specified currency
  */
 export function formatCurrency(amount: number, currency: string = 'USD', locale: string = 'en-US'): string {
   try {
@@ -8,8 +8,12 @@ export function formatCurrency(amount: number, currency: string = 'USD', locale:
       currency: currency,
     }).format(amount)
   } catch (error) {
-    // Fallback
-    return `${currency} ${amount.toFixed(2)}`
+    // Fallback if currency is not supported
+    console.warn(`Currency ${currency} not supported, falling back to USD`)
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount)
   }
 }
 
@@ -27,7 +31,7 @@ export function formatDate(dateString: string): string {
 
 
 /**
- * Get category icon name (using simple names for now)
+ * Get category icon name
  */
 export function getCategoryIcon(category: string): string {
   const icons: Record<string, string> = {
@@ -47,6 +51,7 @@ export function getCategoryIcon(category: string): string {
 }
 
 
+
 /**
  * Validate amount (positive number)
  */
@@ -56,7 +61,7 @@ export function isValidAmount(amount: string | number): boolean {
 }
 
 /**
- * Category color constants (initial set)
+ * Category color constants
  */
 export const CATEGORY_COLORS: Record<string, string> = {
   groceries: '#10b981',
