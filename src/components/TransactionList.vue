@@ -3,9 +3,9 @@
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-lg font-bold text-text-primary">{{ title }}</h3>
       <router-link
-          v-if="showViewAll"
-          :to="viewAllRoute"
-          class="text-sm text-primary-600 hover:text-primary-700 font-medium"
+        v-if="showViewAll"
+        :to="viewAllRoute"
+        class="text-sm text-primary-600 hover:text-primary-700 font-medium"
       >
         View All →
       </router-link>
@@ -13,11 +13,11 @@
 
     <div v-if="transactions.length > 0" class="space-y-3">
       <TransactionCard
-          v-for="transaction in displayedTransactions"
-          :key="transaction.id"
-          :transaction="transaction"
-          :show-delete="showDelete"
-          @delete="$emit('delete', $event)"
+        v-for="transaction in displayedTransactions"
+        :key="transaction.id"
+        :transaction="transaction"
+        :show-delete="showDelete"
+        @delete="$emit('delete', $event)"
       />
     </div>
 
@@ -59,6 +59,6 @@ defineEmits<{
 }>()
 
 const displayedTransactions = computed(() =>
-    props.maxItems > 0 ? props.transactions.slice(0, props.maxItems) : props.transactions
+  props.maxItems > 0 ? props.transactions.slice(0, props.maxItems) : props.transactions
 )
 </script>
