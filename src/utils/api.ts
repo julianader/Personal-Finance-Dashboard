@@ -1,4 +1,4 @@
-import type { Transaction } from '@/types'
+import type { Transaction, ExchangeRates } from '@/types'
 
 // Mock data storage
 const mockTransactions: Transaction[] = [
@@ -20,6 +20,33 @@ const mockTransactions: Transaction[] = [
     date: '2024-01-01',
     createdAt: '2024-01-01T10:00:00Z',
   },
+  {
+    id: '3',
+    type: 'expense',
+    amount: 150,
+    category: 'groceries',
+    description: 'Weekly groceries',
+    date: '2024-01-10',
+    createdAt: '2024-01-10T10:00:00Z',
+  },
+  {
+    id: '4',
+    type: 'expense',
+    amount: 50,
+    category: 'utilities',
+    description: 'Electricity bill',
+    date: '2024-01-12',
+    createdAt: '2024-01-12T10:00:00Z',
+  },
+  {
+    id: '5',
+    type: 'expense',
+    amount: 30,
+    category: 'entertainment',
+    description: 'Movie tickets',
+    date: '2024-01-14',
+    createdAt: '2024-01-14T10:00:00Z',
+  },
 ]
 
 // Simulate API calls with localStorage persistence
@@ -30,8 +57,10 @@ export const api = {
       setTimeout(() => {
         const stored = localStorage.getItem('transactions')
         if (stored !== null) {
+          // Data exists (including empty array) - return it
           resolve(JSON.parse(stored))
         } else {
+          // First time - load mock data
           localStorage.setItem('transactions', JSON.stringify(mockTransactions))
           resolve(mockTransactions)
         }
@@ -45,12 +74,12 @@ export const api = {
       setTimeout(() => {
         const stored = localStorage.getItem('transactions')
         const transactions = stored ? JSON.parse(stored) : mockTransactions
-
+        
         const newTransaction: Transaction = {
           ...transaction,
           id: Date.now().toString(),
         }
-
+        
         transactions.push(newTransaction)
         localStorage.setItem('transactions', JSON.stringify(transactions))
         resolve(newTransaction)
@@ -58,13 +87,13 @@ export const api = {
     })
   },
 
-  // Placeholder for other API methods
+  // Delete a transaction
   async deleteTransaction(id: string): Promise<void> {
     return new Promise((resolve) => {
       setTimeout(() => {
         const stored = localStorage.getItem('transactions')
         const transactions = stored ? JSON.parse(stored) : mockTransactions
-
+        
         const filtered = transactions.filter((t: Transaction) => t.id !== id)
         localStorage.setItem('transactions', JSON.stringify(filtered))
         resolve()
@@ -72,6 +101,8 @@ export const api = {
     })
   },
 
+
+  // Delete all transactions
   async deleteAllTransactions(): Promise<void> {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -81,8 +112,20 @@ export const api = {
     })
   },
 
-  // Placeholder for exchange rates
-  async getExchangeRates(): Promise<any> {
-    return {}
+  // Get exchange rates from Open Exchange Rates API
+  async getExchangeRates(): Promise<ExchangeRates> {
+    const appId = 'f8c6b76e1ea24e3d821c4bcbe3083547'
+    const response = await fetch(`https://openexchangerates.org/api/latest.json?app_id=${appId}`)
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch exchange rates: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return {
+      base: data.base,
+      rates: data.rates,
+      timestamp: data.timestamp,
+    }
   },
 }
