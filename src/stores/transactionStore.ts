@@ -2,13 +2,14 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { Transaction, DashboardStats, CategoryBreakdown } from '@/types'
 import { api } from '@/utils/api'
-import { CATEGORY_COLORS } from '@/utils/helpers' // Will be used later
+import { useCurrencyStore } from '@/stores/currencyStore'
+import { CATEGORY_COLORS } from '@/utils/helpers'
 
 export const useTransactionStore = defineStore('transactions', () => {
   const transactions = ref<Transaction[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
-  // Currency store will be added later
+  const currencyStore = useCurrencyStore()
 
   // Fetch all transactions from API
   const fetchTransactions = async () => {
@@ -77,21 +78,23 @@ export const useTransactionStore = defineStore('transactions', () => {
     }
   }
 
-  // Computed: Total income (in base currency)
+  // Computed: Total income (converted to selected currency)
   const totalIncome = computed(() => {
-    return transactions.value
+    const baseAmount = transactions.value
       .filter(t => t.type === 'income')
       .reduce((sum, t) => sum + t.amount, 0)
+    return currencyStore.convertFromBase(baseAmount)
   })
 
-  // Computed: Total expenses (in base currency)
+  // Computed: Total expenses (converted to selected currency)
   const totalExpenses = computed(() => {
-    return transactions.value
+    const baseAmount = transactions.value
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + t.amount, 0)
+    return currencyStore.convertFromBase(baseAmount)
   })
 
-  // Computed: Balance (in base currency)
+  // Computed: Balance (converted to selected currency)
   const balance = computed(() => {
     return totalIncome.value - totalExpenses.value
   })
@@ -105,9 +108,33 @@ export const useTransactionStore = defineStore('transactions', () => {
     savingsRate: totalIncome.value > 0 ? (balance.value / totalIncome.value) * 100 : 0,
   }))
 
-  // Computed: Category breakdown (placeholder for now)
+  // Computed: Category breakdown for expenses
   const expenseCategoryBreakdown = computed<CategoryBreakdown[]>(() => {
-    return []
+    const categoryMap = new Map<string, number>()
+
+    transactions.value
+      .filter(t => t.type === 'expense')
+      .forEach(t => {
+        const current = categoryMap.get(t.category) || 0
+        categoryMap.set(t.category, current + t.amount)
+      })
+
+    // Convert category amounts to selected currency
+    const convertedCategoryMap = new Map<string, number>()
+    categoryMap.forEach((amount, category) => {
+      convertedCategoryMap.set(category, currencyStore.convertFromBase(amount))
+    })
+
+    const total = totalExpenses.value
+    return Array.from(convertedCategoryMap.entries())
+      .map(([category, amount]) => ({
+        category,
+        amount,
+        percentage: total > 0 ? (amount / total) * 100 : 0,
+        color: CATEGORY_COLORS[category.toLowerCase()] || '#6b7280',
+        icon: getCategoryIcon(category),
+      }))
+      .sort((a, b) => b.amount - a.amount)
   })
 
 
@@ -134,3 +161,20 @@ export const useTransactionStore = defineStore('transactions', () => {
     recentTransactions,
   }
 })
+
+function getCategoryIcon(category: string): string {
+  const icons: Record<string, string> = {
+    groceries: '🛒',
+    rent: '🏠',
+    utilities: '💡',
+    entertainment: '🎬',
+    transportation: '🚗',
+    healthcare: '🏥',
+    education: '📚',
+    salary: '💼',
+    freelance: '💻',
+    investment: '📈',
+    other: '📌',
+  }
+  return icons[category.toLowerCase()] || '📌'
+}
