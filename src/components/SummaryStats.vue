@@ -38,6 +38,7 @@
       </div>
     </div>
   </template>
+  
   <script setup lang="ts">
   export interface StatItem {
     label: string
@@ -47,8 +48,11 @@
     progressColor?: string
     subtitle?: string
   }
+  
   interface Props {
     stats: StatItem[]
   }
+  
   defineProps<Props>()
   </script>
+  
